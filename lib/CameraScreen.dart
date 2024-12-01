@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'Product.dart';
 import 'CustomAddBar.dart';
-import 'DisplayPictureScree.dart';
+import 'DisplayPictureScreen.dart';
 
 class CameraScreen extends StatefulWidget {
   final CameraDescription camera;
