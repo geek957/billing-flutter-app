@@ -41,6 +41,7 @@ class _CameraScreenState extends State<CameraScreen> {
     await Future.delayed(Duration(microseconds: Random().nextInt(1000) + 10000));
     widget.onImageCaptured(Product(id: "{Random().nextInt(10) + 100}",imagePath: imagePath, quantity: 1, cost: Random().nextInt(30)));
     return;
+    // Test with local server
     // final request = http.MultipartRequest('POST', Uri.parse('http://10.0.2.2:3000/upload'));
     // request.files.add(await http.MultipartFile.fromPath('image', imagePath));
     // final response = await request.send();
