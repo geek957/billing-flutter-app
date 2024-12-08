@@ -43,8 +43,6 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   Future<void> _uploadImage(String imagePath) async {
-    // Add a delay of 1 second
-    // await Future.delayed(const Duration(seconds: 1));
 
     // Create a multipart request
     var request = http.MultipartRequest('POST', Uri.parse('${Config.apiUrl}/search'));
