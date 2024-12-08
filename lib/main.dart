@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'HomePage.dart';
+import 'SettingsScreen.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final cameras = await availableCameras();
@@ -20,6 +22,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: HomePage(camera: camera),
+      routes: {
+        '/settings': (context) => SettingsScreen(),
+      },
     );
   }
 }

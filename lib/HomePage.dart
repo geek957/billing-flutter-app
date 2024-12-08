@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'Product.dart';
-import 'CameraScreen.dart';
 import 'CustomAddBar.dart';
+import 'CameraScreen.dart';
+import 'Product.dart';
 
 class HomePage extends StatefulWidget {
   final CameraDescription camera;
@@ -32,25 +32,47 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'Billing',
+        title: 'Home Page',
         onHomePressed: resetProducts,
       ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => CameraScreen(
-                  camera: widget.camera,
-                  onImageCaptured: addProduct,
-                  products: products,
-                  onHomePressed: resetProducts,
+      body: Stack(
+        children: [
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => CameraScreen(
+                          camera: widget.camera,
+                          onImageCaptured: addProduct,
+                          products: products,
+                          onHomePressed: resetProducts,
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green, // Set the background color to green
+                  ),
+                  child: const Text('Start'),
                 ),
-              ),
-            );
-          },
-          child: const Text('Start'),
-        ),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () {
+                Navigator.of(context).pushNamed('/settings');
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

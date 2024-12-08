@@ -72,13 +72,17 @@ class DisplayPictureScreen extends StatelessWidget {
                 ...products.map((product) {
                   return TableRow(
                     children: [
-                      Align(
-                        // padding: const EdgeInsets.all(8.0),
-                        alignment: Alignment(-0.5, 0),
-                        // Padding(padding: const EdgeInsets.all(8.0)),
-                        child: SizedBox(
-                          height: 50, // Adjust the height as needed
-                          child: Image.file(File(product.imagePath)),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0, right: 8.0, bottom: 8.0),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              height: 50, // Adjust the height as needed
+                              child: Image.file(File(product.imagePath)),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(product.name), // Display the product name beside the image
+                          ],
                         ),
                       ),
                       Padding(
