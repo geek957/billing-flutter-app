@@ -25,6 +25,7 @@ class _CameraScreenState extends State<CameraScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
   final ImagePicker _picker = ImagePicker();
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -43,7 +44,9 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   Future<void> _uploadImage(String imagePath) async {
-
+    setState(() {
+      _isLoading = true;
+    });
     // Create a multipart request
     final url = Config.apiUrl;
     final request = http.MultipartRequest('POST', Uri.parse('${url}/search'));
@@ -72,6 +75,9 @@ class _CameraScreenState extends State<CameraScreen> {
     } else {
       print('Ping failed with status: ${response.statusCode}');
     }
+    setState(() {
+      _isLoading = false;
+    });
 
     // Simulate image upload and product creation
     widget.onImageCaptured(product);
@@ -100,15 +106,26 @@ class _CameraScreenState extends State<CameraScreen> {
         title: 'Capture',
         onHomePressed: widget.onHomePressed,
       ),
-      body: FutureBuilder<void>(
-        future: _initializeControllerFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return CameraPreview(_controller);
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        },
+      body: Stack(
+        children: [
+          FutureBuilder<void>(
+          future: _initializeControllerFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return CameraPreview(_controller);
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+          },
+          ),
+          if (_isLoading)
+            Container(
+              color: Colors.black54,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+  ],
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
