@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'Home Page',
+        title: 'Billing',
         onHomePressed: resetProducts,
       ),
       body: Stack(
