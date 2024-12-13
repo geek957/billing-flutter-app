@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'config.dart';
+import 'Config.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -27,7 +27,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ElevatedButton(
               onPressed: () {
                 setState(() {
-                  Config.apiUrl = _urlController.text;
+                  Config.updateApiUrl(_urlController.text);
                 });
                 Navigator.pop(context);
               },

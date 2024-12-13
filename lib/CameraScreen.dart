@@ -45,7 +45,8 @@ class _CameraScreenState extends State<CameraScreen> {
   Future<void> _uploadImage(String imagePath) async {
 
     // Create a multipart request
-    var request = http.MultipartRequest('POST', Uri.parse('${Config.apiUrl}/search'));
+    final url = Config.apiUrl;
+    final request = http.MultipartRequest('POST', Uri.parse('${url}/search'));
     request.files.add(await http.MultipartFile.fromPath('image', imagePath));
 
     // Send the request
