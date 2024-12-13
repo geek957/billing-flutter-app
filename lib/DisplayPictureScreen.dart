@@ -81,7 +81,11 @@ class DisplayPictureScreen extends StatelessWidget {
                               child: Image.file(File(product.imagePath)),
                             ),
                             const SizedBox(width: 8),
-                            Text(product.name), // Display the product name beside the image
+                            Text(
+                               product.name.length > 16
+                                  ? '${product.name.substring(0, 16)}...'
+                                  : product.name,
+                            ), // Display the product name beside the image
                           ],
                         ),
                       ),
