@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import 'HomePage.dart';
 import 'SettingsScreen.dart';
 import 'http_overrides.dart';
+import 'Config.dart';
 
 void main() async {
   HttpOverrides.global = MyHttpOverrides();
@@ -13,7 +14,7 @@ void main() async {
   final firstCamera = cameras.firstWhere(
     (camera) => camera.lensDirection == CameraLensDirection.back,
   );
-
+  await Config.initialize();
   runApp(MyApp(camera: firstCamera));
 }
 

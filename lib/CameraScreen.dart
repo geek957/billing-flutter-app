@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
@@ -47,12 +48,14 @@ class _CameraScreenState extends State<CameraScreen> {
     setState(() {
       _isLoading = true;
     });
-    // Create a multipart request
-    final url = Config.apiUrl;
-    final request = http.MultipartRequest('POST', Uri.parse('${url}/search'));
-    request.files.add(await http.MultipartFile.fromPath('image', imagePath));
 
-    // Send the request
+    final url = Config.apiUrl;
+    final merchantId = Config.merchantId == 'test' ? '1' : Config.merchantId;
+    final request = http.MultipartRequest('POST', Uri.parse('$url/search?merchantId=$merchantId'));
+    request.files.add(await http.MultipartFile.fromPath('image', imagePath));
+    request.headers.addEntries([
+      MapEntry('Authorization', Config.authString),
+    ]);
     var response = await request.send();
     Product product = Product(
       id: (Random().nextInt(10) + 100).toString(),
@@ -81,21 +84,88 @@ class _CameraScreenState extends State<CameraScreen> {
 
     // Simulate image upload and product creation
     widget.onImageCaptured(product);
+    _showFeedbackPopup(imagePath, product);
+  }
+
+  void _showFeedbackPopup(String imagePath, Product product) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Feedback', style: TextStyle(fontSize: 18),),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              SizedBox(
+                height: 150,
+                width: 150,
+                child:Image.file(File(product.imagePath))
+              ),
+              Text('Product: ${product.name}'),
+              Text('Cost: ${product.cost}'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.thumb_up, color: Colors.green),
+                    iconSize: 40,
+                    onPressed: () => _sendFeedback(imagePath, product, 'like'),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.thumb_down, color: Colors.red,),
+                    iconSize: 40,
+                    onPressed: () => _sendFeedback(imagePath, product, 'unlike'),
+                  ),
+                ],
+              ),
+              ElevatedButton(
+                onPressed: () => _navigateToNextPage(),
+                child: Text('Next'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _sendFeedback(String imagePath, Product product, String status) async {
+    final String correct = status == 'like' ? 'yes' : 'no';
+    final String url = '${Config.apiUrl}/feedback?merchantId=${Config.merchantId}&productId=${product.id}&correct=$correct';
+
+    final request = http.MultipartRequest('POST', Uri.parse(url));
+    request.files.add(await http.MultipartFile.fromPath('image', imagePath));
+    request.headers.addEntries([
+      MapEntry('Authorization', Config.authString),
+    ]);
+
+    await request.send();
+
+    if (status == 'unlike') {
+      widget.products.removeLast();
+    }
+
+    _navigateToNextPage();
+  }
+
+  void _navigateToNextPage() {
+    Navigator.of(context).pop();
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => DisplayPictureScreen(
+          camera: widget.camera,
+          products: [...widget.products],
+          onHomePressed: widget.onHomePressed,
+        ),
+      ),
+    );
   }
 
   Future<void> _pickImageFromGallery() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       await _uploadImage(pickedFile.path);
-      await Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => DisplayPictureScreen(
-            camera: widget.camera,
-            products: widget.products,
-            onHomePressed: widget.onHomePressed,
-          ),
-        ),
-      );
     }
   }
 
@@ -109,14 +179,14 @@ class _CameraScreenState extends State<CameraScreen> {
       body: Stack(
         children: [
           FutureBuilder<void>(
-          future: _initializeControllerFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return CameraPreview(_controller);
-            } else {
-              return const Center(child: CircularProgressIndicator());
-            }
-          },
+            future: _initializeControllerFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return CameraPreview(_controller);
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
           ),
           if (_isLoading)
             Container(
@@ -125,7 +195,7 @@ class _CameraScreenState extends State<CameraScreen> {
                 child: CircularProgressIndicator(),
               ),
             ),
-  ],
+        ],
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -138,16 +208,6 @@ class _CameraScreenState extends State<CameraScreen> {
                 if (!mounted) return;
 
                 await _uploadImage(image.path);
-
-                await Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => DisplayPictureScreen(
-                      camera: widget.camera,
-                      products: [...widget.products],
-                      onHomePressed: widget.onHomePressed,
-                    ),
-                  ),
-                );
               } catch (e) {
                 print(e);
               }
