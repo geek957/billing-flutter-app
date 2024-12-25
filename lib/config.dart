@@ -32,6 +32,6 @@ class Config {
 
   static Future<String?> loadMerchantId() async {
     String? id = await Storage.loadVariable("merchantId");
-    return id ?? "defaultMerchantId";
+    return id ?? "test";
   }
 }

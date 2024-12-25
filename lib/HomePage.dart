@@ -55,9 +55,12 @@ class _HomePageState extends State<HomePage> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green, // Set the background color to green
+                    backgroundColor: const Color.fromARGB(255, 108, 206, 111), // Set the background color to green
+                    minimumSize: Size(80, 40), // Set the minimum size of the button
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12), // Adjust padding
+                    textStyle: TextStyle(fontSize: 20), // Increase the font size
                   ),
-                  child: const Text('Start'),
+                  child: const Text('Begin'),
                 ),
               ],
             ),

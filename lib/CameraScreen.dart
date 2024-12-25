@@ -90,47 +90,70 @@ class _CameraScreenState extends State<CameraScreen> {
   void _showFeedbackPopup(String imagePath, Product product) {
     showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: false, // Prevents dismissing the dialog by tapping outside
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Feedback', style: TextStyle(fontSize: 18),),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              SizedBox(
-                height: 150,
-                width: 150,
-                child:Image.file(File(product.imagePath))
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(
+                'Feedback',
+                style: TextStyle(fontSize: 18), // Set the desired font size
               ),
-              Text('Product: ${product.name}'),
-              Text('Cost: ${product.cost}'),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  IconButton(
-                    icon: Icon(Icons.thumb_up, color: Colors.green),
-                    iconSize: 40,
-                    onPressed: () => _sendFeedback(imagePath, product, 'like'),
+              content: Stack(
+                children: [
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      SizedBox(
+                        width: 150, // Set the desired width
+                        height: 150, // Set the desired height
+                        child: Image.file(File(product.imagePath)),
+                      ),
+                      Text('Product: ${product.name}'),
+                      Text('Description: ${product.cost}'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          IconButton(
+                            icon: Icon(Icons.thumb_up, color: Colors.green),
+                            iconSize: 40, // Increase the size of the icon
+                            onPressed: () => _sendFeedback(imagePath, product, 'like', setState),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.thumb_down, color: Colors.red),
+                            iconSize: 40, // Increase the size of the icon
+                            onPressed: () => _sendFeedback(imagePath, product, 'unlike', setState),
+                          ),
+                        ],
+                      ),
+                      ElevatedButton(
+                        onPressed: () => _navigateToNextPage(),
+                        child: Text('Next'),
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    icon: Icon(Icons.thumb_down, color: Colors.red,),
-                    iconSize: 40,
-                    onPressed: () => _sendFeedback(imagePath, product, 'unlike'),
-                  ),
+                  if (_isLoading)
+                    Positioned.fill(
+                      child: Container(
+                        color: Colors.black54,
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                    ),
                 ],
               ),
-              ElevatedButton(
-                onPressed: () => _navigateToNextPage(),
-                child: Text('Next'),
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
   }
 
-  void _sendFeedback(String imagePath, Product product, String status) async {
+  void _sendFeedback(String imagePath, Product product, String status, StateSetter setState) async {
+    setState(() {
+      _isLoading = true;
+    });
     final String correct = status == 'like' ? 'yes' : 'no';
     final String url = '${Config.apiUrl}/feedback?merchantId=${Config.merchantId}&productId=${product.id}&correct=$correct';
 
@@ -145,7 +168,9 @@ class _CameraScreenState extends State<CameraScreen> {
     if (status == 'unlike') {
       widget.products.removeLast();
     }
-
+    setState(() {
+      _isLoading = false;
+    });
     _navigateToNextPage();
   }
 
