@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'HomePage.dart';
-import 'SettingsScreen.dart';
+import 'home_page.dart';
+import 'settings_screen.dart';
 import 'http_overrides.dart';
-import 'Config.dart';
+import 'config.dart';
 
 void main() async {
   HttpOverrides.global = MyHttpOverrides();

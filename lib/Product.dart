@@ -3,9 +3,9 @@ class Product {
   final String imagePath;
   final String name;
   final int quantity;
-  final int cost;
+  final int price;
 
-  Product({this.id = "101",this.name = "test", required this.imagePath, this.quantity = 1, this.cost = 10});
+  Product({this.id = "101",this.name = "test", this.imagePath = "", this.quantity = 1, this.price = 10});
   Map<String, dynamic> toJson() {
 
     return {
@@ -13,7 +13,7 @@ class Product {
       'imagePath': imagePath,
       'name': name,
       'quantity': quantity,
-      'cost': cost,
+      'price': price,
     };
   }
 }
