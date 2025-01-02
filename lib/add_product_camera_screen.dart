@@ -22,7 +22,7 @@ class _AddProductCameraScreenState extends State<AddProductCameraScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = CameraController(widget.camera, ResolutionPreset.high);
+    _controller = CameraController(widget.camera, ResolutionPreset.high, enableAudio: false);
     _initializeControllerFuture = _controller.initialize();
   }
 

@@ -11,11 +11,14 @@ void main() async {
   HttpOverrides.global = MyHttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
   final cameras = await availableCameras();
-  final firstCamera = cameras.firstWhere(
-    (camera) => camera.lensDirection == CameraLensDirection.back,
-  );
+  CameraDescription? firstCamera;
+  if (cameras.isNotEmpty) {
+    firstCamera = cameras.firstWhere(
+      (camera) => camera.lensDirection == CameraLensDirection.back,
+    );
+  }
   await Config.initialize();
-  runApp(MyApp(camera: firstCamera));
+  runApp(MyApp(camera: firstCamera ?? CameraDescription(name: 'Default', lensDirection: CameraLensDirection.back, sensorOrientation: 0)));
 }
 
 class MyApp extends StatelessWidget {

@@ -82,46 +82,61 @@ class _AdminHomePageState extends State<AdminHomePage> {
         children: [
           _isLoading
               ? Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      if (_products.isNotEmpty)
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: DataTable(
-                            columns: [
-                              DataColumn(label: Text('Id')),
-                              DataColumn(label: Text('Name')),
-                              DataColumn(label: Text('Price')),
-                              DataColumn(label: Text('Actions')),
-                            ],
-                            rows: _products.map((product) {
-                              return DataRow(cells: [
-                                DataCell(Text(product['id'].toString().substring(6-3))),
-                                DataCell(Text(
-                                  product['name'].length > 7
-                                      ? '${product['name'].substring(0, 7)}...'
-                                      : product['name'],
-                                )),
-                                DataCell(Text('${product['price']} \₹')),
-                                DataCell(
-                                  IconButton(
-                                    icon: Icon(Icons.close, color: Colors.red),
-                                    onPressed: () => _deleteProduct(product['id'].toString()),
-                                  ),
-                                ),
-                              ]);
-                            }).toList(),
-                          ),
-                        ),
-                      if (_products.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Text('No products available'),
-                        ),
-                      SizedBox(height: 80), // Add space for the button
-                    ],
-                  ),
+              : LayoutBuilder(
+                  builder: (context, constraints) {
+                    final double idColumnWidth = constraints.maxWidth / 8; 
+                    final double actionsColumnWidth = constraints.maxWidth / 8; // Reduced width for Actions column
+                    final double priceColumnWidth = constraints.maxWidth / 8; 
+                    final double nameColumnWidth = constraints.maxWidth/4; // Adjusted to fit within the screen
+
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          if (_products.isNotEmpty)
+                            DataTable(
+                              columnSpacing: constraints.maxHeight / 20, // Reduced space between columns
+                              columns: [
+                                DataColumn(label: Container(width: idColumnWidth, child: Text('Id'))),
+                                DataColumn(label: Container(width: nameColumnWidth, child: Text('Name'))),
+                                DataColumn(label: Container(width: priceColumnWidth, child: Text('Price'))),
+                                DataColumn(label: Container(width: actionsColumnWidth, child: Text('Actions'))),
+                              ],
+                              rows: _products.map((product) {
+                                final productId = product['id'].toString();
+                                final truncatedId = productId.length > 3
+                                    ? productId.substring(productId.length - 3)
+                                    : productId;
+                                return DataRow(cells: [
+                                  DataCell(Container(width: idColumnWidth, child: Text(truncatedId))),
+                                  DataCell(Container(
+                                    width: nameColumnWidth,
+                                    child: Text(
+                                      product['name'].length > 8
+                                          ? '${product['name'].substring(0, 8)}...'
+                                          : product['name'],
+                                    ),
+                                  )),
+                                  DataCell(Container(width: priceColumnWidth, child: Text('${product['price']} \₹'))),
+                                  DataCell(Container(
+                                    width: actionsColumnWidth,
+                                    child: IconButton(
+                                      icon: Icon(Icons.close, color: Colors.red),
+                                      onPressed: () => _deleteProduct(product['id'].toString()),
+                                    ),
+                                  )),
+                                ]);
+                              }).toList(),
+                            ),
+                          if (_products.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text('No products available'),
+                            ),
+                          SizedBox(height: 80), // Add space for the button
+                        ],
+                      ),
+                    );
+                  },
                 ),
           Positioned(
             bottom: 16,
